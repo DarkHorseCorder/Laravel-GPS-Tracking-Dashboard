@@ -28,7 +28,7 @@
                 <h6 class="ms-2 text-uppercase text-xs font-weight-bolder opacity-6 mb-0">Reports</h6>
             </li>
             <li class="nav-item">
-                <a class="nav-link <?php echo e(Route::currentRouteName() == 'profile' ? 'active' : ''); ?>" href="<?php echo e(route('profile')); ?>">
+                <a class="nav-link <?php echo e(Route::currentRouteName() == 'green-driving' ? 'active' : ''); ?>" href="<?php echo e(route('green-driving')); ?>">
                     <div
                         class="icon icon-shape icon-sm border-radius-md text-center me-2 d-flex align-items-center justify-content-center">
                         <i class="ni ni-bullet-list-67 text-dark text-sm opacity-10"></i>
@@ -37,7 +37,7 @@
                 </a>
             </li>
             <li class="nav-item">
-                <a class="nav-link <?php echo e(Route::currentRouteName() == 'profile' ? 'active' : ''); ?>" href="<?php echo e(route('profile')); ?>">
+                <a class="nav-link <?php echo e(Route::currentRouteName() == 'performance' ? 'active' : ''); ?>" href="<?php echo e(route('performance')); ?>">
                     <div
                         class="icon icon-shape icon-sm border-radius-md text-center me-2 d-flex align-items-center justify-content-center">
                         <i class="ni ni-bullet-list-67 text-dark text-sm opacity-10"></i>
@@ -46,7 +46,7 @@
                 </a>
             </li>
             <li class="nav-item">
-                <a class="nav-link <?php echo e(Route::currentRouteName() == 'profile' ? 'active' : ''); ?>" href="<?php echo e(route('profile')); ?>">
+                <a class="nav-link <?php echo e(Route::currentRouteName() == 'temperature' ? 'active' : ''); ?>" href="<?php echo e(route('temperature')); ?>">
                     <div
                         class="icon icon-shape icon-sm border-radius-md text-center me-2 d-flex align-items-center justify-content-center">
                         <i class="ni ni-bullet-list-67 text-dark text-sm opacity-10"></i>

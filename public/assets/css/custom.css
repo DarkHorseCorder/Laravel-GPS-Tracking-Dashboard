@@ -1,0 +1,51 @@
+.open>.dropdown-menu {
+    display: block;
+}
+.multiselect-native-select .btn-group{
+    display: block;
+    border: 1px solid #d2d6da;
+    border-radius: 0.5rem;
+}
+.multiselect-native-select .open{
+    border-radius: 10px 10px 0px 0px;
+}
+.multiselect-native-select .btn-group button{
+    margin: 0;
+    box-shadow: none;
+    width: 100%;
+}
+.multiselect-native-select .btn-group button:hover{
+    margin: 0;
+    box-shadow: none;
+    width: 100%;
+}
+.multiselect-container{
+    width: 100%;
+    border: 1px solid;
+    border-top: none;
+    border-radius: 0px 0px 10px 10px;
+}
+.multiselect-container li div input{
+    border: 1px solid!important;
+    border-radius: 10px;
+}
+.multiselect-container li a label input {
+    border: 1px solid #cbd3da;
+    margin-top: 0.25rem;
+    position: relative;
+}
+
+.multiselect-container li a label input::after{
+    transition: opacity 0.25s ease-in-out;
+    font-family: "FontAwesome";
+    content: "\f00c";
+    width: 100%;
+    height: 100%;
+    color: #fff;
+    position: absolute;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 0.67rem;
+    opacity: 0;
+}

@@ -42,7 +42,12 @@ Route::group(['middleware' => 'auth'], function () {
 	Route::post('/profile', [UserProfileController::class, 'update'])->name('profile.update');
 	Route::get('/profile-static', [PageController::class, 'profile'])->name('profile-static'); 
 	Route::get('/sign-in-static', [PageController::class, 'signin'])->name('sign-in-static');
-	Route::get('/sign-up-static', [PageController::class, 'signup'])->name('sign-up-static'); 
+	Route::get('/sign-up-static', [PageController::class, 'signup'])->name('sign-up-static');
+	Route::get('/green-driving', [PageController::class, 'greendriving'])->name('green-driving');
+	Route::post('/green-driving', [PageController::class, 'greendrivingReportGenerate'])->name('generateReport.green-driving');
+	Route::get('/performance', [PageController::class, 'performance'])->name('performance');
+	Route::post('/performance', [PageController::class, 'performanceReportGenerate'])->name('generateReport.performance');
+	Route::get('/temperature', [PageController::class, 'temperature'])->name('temperature'); 
 	Route::get('/{page}', [PageController::class, 'index'])->name('page');
 	Route::post('logout', [LoginController::class, 'logout'])->name('logout');
 });
