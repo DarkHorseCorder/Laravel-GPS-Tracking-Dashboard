@@ -26,7 +26,7 @@
                                 <td>{{$outPutData['driverName']}}</td>
                                 <td>{{$outPutData['deviceName']}}</td>
                                 <td>{{$outPutData['totalDistance']}}</td>
-                                <td>{{$outPutData['totalMaxAcceleration']}}</td>
+                                <td>{{$outPutData['totalFuelUsed']}}</td>
                                 <td>{{$outPutData['totalMaxBraking']}}</td>
                                 <td>{{$outPutData['totalMaxCornering']}}</td>
                             </tr>

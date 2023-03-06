@@ -83,7 +83,7 @@
                                 </div>
                                 <div class="col-md-6">
                                     <div class="form-group">
-                                        <label for="gallonPrice" class="form-control-label">Gallon Price</label>
+                                        <label for="gallonPrice" class="form-control-label">Gallon Price (RD$)</label>
                                         <input class="form-control" type="text" name="gallonPrice" placeholder="" required>
                                     </div>
                                 </div>

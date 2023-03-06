@@ -150,6 +150,9 @@ class PageController extends Controller
         foreach($devicesData as $dData){
             $totalDistance = 0;
             $totalFuelUsed = 0;
+            $unitPerformance = 0;
+            $kilometerCost = 0;
+            $totalRouteCost = 0;
             $HistoryapiURL = "104.131.12.58/api/get_history?user_api_hash=".$user_api_hash_value."&device_id=".$dData["deviceID"]."&from_date=".$fromDate."&from_time=".$fromTime."&to_date=".$toDate."&to_time=".$toTime;
             $HistoryResponse = Http::timeout(180)->get($HistoryapiURL);
             $HistoryJsonData = $HistoryResponse->json();
@@ -161,9 +164,23 @@ class PageController extends Controller
                 $initRecord = end($HistoryRecordItems);
                 $initRecordXML = simplexml_load_string($initRecord['items'][0]['other']);
                 $initFuelRecord = (int) $initRecordXML->fuelused;
-                $totalFuelUsed = $initFuelRecord - $lastFuelRecord;
+                $totalFuelUsed = round(($initFuelRecord - $lastFuelRecord) * 0.264172, 1);
+                if($totalFuelUsed == 0){
+                    $unitPerformance = "No data";
+                    $kilometerCost = "No data";
+                    $totalRouteCost = "No data";
+                }
+                else {
+                    $distanceValue = filter_var($totalDistance, FILTER_SANITIZE_NUMBER_FLOAT, FILTER_FLAG_ALLOW_FRACTION);
+                    $unitPerformance = round($totalFuelUsed / $distanceValue, 1);
+                    $kilometerCost = round($totalFuelUsed * $gallonPrice/ $distanceValue, 1);
+                    $totalRouteCost = round($totalFuelUsed * $gallonPrice, 1);
+                }
             } else {
                 $totalFuelUsed = "No data";
+                $unitPerformance = "No data";
+                $kilometerCost = "No data";
+                $totalRouteCost = "No data";
             }
             $eachDeviceData = [
                 'deviceID' => $dData["deviceID"],
@@ -171,7 +188,9 @@ class PageController extends Controller
                 'deviceName' => $dData["deviceName"],
                 'totalDistance' => $totalDistance,
                 'totalFuelUsed' => $totalFuelUsed,
-                'gallonPrice' => $gallonPrice
+                'unitPerformance' => $unitPerformance,
+                'kilometerCost' => $kilometerCost,
+                'totalRouteCost' => $totalRouteCost
             ];
             array_push($totalOutputData, $eachDeviceData);
         }
@@ -181,6 +200,9 @@ class PageController extends Controller
     }
     public function temperature()
     {
-        return view("pages.temperature");
+        $response = Http::get('104.131.12.58/api/get_devices?user_api_hash=$2y$10$lbsXqkJbyeu6WMfYNBhxa.r6qBLW1WJKBQy10gABW96PcFTlC7Q/O');
+        $jsonData = $response->json();
+        $devices = $jsonData[0]['items'];
+        return view("pages.temperature", compact('devices'));
     }
 }
