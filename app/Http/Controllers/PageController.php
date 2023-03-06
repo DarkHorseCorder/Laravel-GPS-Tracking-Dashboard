@@ -72,16 +72,16 @@ class PageController extends Controller
             $totalMaxBraking = 0;
             $totalMaxCornering = 0;
             $HistoryapiURL = "104.131.12.58/api/get_history?user_api_hash=".$user_api_hash_value."&device_id=".$dData["deviceID"]."&from_date=".$fromDate."&from_time=".$fromTime."&to_date=".$toDate."&to_time=".$toTime;
-            $HistoryResponse = Http::get($HistoryapiURL);
+            $HistoryResponse = Http::timeout(180)->get($HistoryapiURL);
             $HistoryJsonData = $HistoryResponse->json();
             $totalDistance = $HistoryJsonData["distance_sum"];
             $apiURL = "104.131.12.58/api/get_events?user_api_hash=".$user_api_hash_value."&device_id=".$dData["deviceID"]."&date_from=".$fromDate."&date_to=".$toDate;
-            $response = Http::get($apiURL);
+            $response = Http::timeout(180)->get($apiURL);
             $jsonData = $response->json();
             $total_page = $jsonData["items"]["last_page"];
             for($i = 1; $i <= $total_page; $i++){
                 $EventApiURL = "104.131.12.58/api/get_events?page=".$i."&user_api_hash=".$user_api_hash_value."&device_id=".$dData["deviceID"]."&date_from=".$fromDate."&date_to=".$toDate;
-                $EventResponse = Http::get($EventApiURL);
+                $EventResponse = Http::timeout(180)->get($EventApiURL);
                 $EventJsonData = $EventResponse->json();
                 $Events = $EventJsonData["items"]["data"];
                 foreach($Events as $event){
@@ -143,12 +143,40 @@ class PageController extends Controller
         $fromTime = $request->input('periodTimeFrom');
         $toDate = $request->input('periodDateTo');
         $toTime = $request->input('periodTimeTo');
+        $gallonPrice = $request->input('gallonPrice');
 
         //output data
         $totalOutputData = [];
         foreach($devicesData as $dData){
-            
+            $totalDistance = 0;
+            $totalFuelUsed = 0;
+            $HistoryapiURL = "104.131.12.58/api/get_history?user_api_hash=".$user_api_hash_value."&device_id=".$dData["deviceID"]."&from_date=".$fromDate."&from_time=".$fromTime."&to_date=".$toDate."&to_time=".$toTime;
+            $HistoryResponse = Http::timeout(180)->get($HistoryapiURL);
+            $HistoryJsonData = $HistoryResponse->json();
+            $totalDistance = $HistoryJsonData["distance_sum"];
+            $HistoryRecordItems = $HistoryJsonData["items"];
+            $lastRecordXML = simplexml_load_string($HistoryRecordItems[0]['items'][0]['other']);
+            if (property_exists($lastRecordXML, 'fuelused')){
+                $lastFuelRecord = (int) $lastRecordXML->fuelused;
+                $initRecord = end($HistoryRecordItems);
+                $initRecordXML = simplexml_load_string($initRecord['items'][0]['other']);
+                $initFuelRecord = (int) $initRecordXML->fuelused;
+                $totalFuelUsed = $initFuelRecord - $lastFuelRecord;
+            } else {
+                $totalFuelUsed = "No data";
+            }
+            $eachDeviceData = [
+                'deviceID' => $dData["deviceID"],
+                'driverName' => $dData["driverName"],
+                'deviceName' => $dData["deviceName"],
+                'totalDistance' => $totalDistance,
+                'totalFuelUsed' => $totalFuelUsed,
+                'gallonPrice' => $gallonPrice
+            ];
+            array_push($totalOutputData, $eachDeviceData);
         }
+        // dd($totalOutputData);
+        return view("pages.performance_result", compact('totalOutputData'));
 
     }
     public function temperature()
