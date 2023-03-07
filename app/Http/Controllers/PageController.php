@@ -268,6 +268,7 @@ class PageController extends Controller
                 }
             }
         }
-        dd($totalOutputData);
+        // dd($totalOutputData);
+        return view("pages.temperature_result", compact('totalOutputData'));
     }
 }

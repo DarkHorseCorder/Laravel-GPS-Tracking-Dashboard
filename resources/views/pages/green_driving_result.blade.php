@@ -15,9 +15,13 @@
                                 <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Driver Name</th>
                                 <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">Device Name</th>
                                 <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Total Distance</th>
+                                <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Speeding Count</th>
+                                <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Speeding Duration</th>
                                 <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Max Acceleration</th>
                                 <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Max Braking</th>
                                 <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Max Cornering</th>
+                                <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Driver Score</th>
+
                             </tr>
                         </thead>
                         <tbody>
@@ -26,9 +30,12 @@
                                 <td>{{$outPutData['driverName']}}</td>
                                 <td>{{$outPutData['deviceName']}}</td>
                                 <td>{{$outPutData['totalDistance']}}</td>
+                                <td>Speed Count</td>
+                                <td>Speed Duration</td>
                                 <td>{{$outPutData['totalFuelUsed']}}</td>
                                 <td>{{$outPutData['totalMaxBraking']}}</td>
                                 <td>{{$outPutData['totalMaxCornering']}}</td>
+                                <td>Driver Score</td>
                             </tr>
                             @endforeach
                         </tbody>
