@@ -48,6 +48,7 @@ Route::group(['middleware' => 'auth'], function () {
 	Route::get('/performance', [PageController::class, 'performance'])->name('performance');
 	Route::post('/performance', [PageController::class, 'performanceReportGenerate'])->name('generateReport.performance');
 	Route::get('/temperature', [PageController::class, 'temperature'])->name('temperature'); 
+	Route::post('/temperature', [PageController::class, 'temperatureReportGenerate'])->name('generateReport.temprature'); 
 	Route::get('/{page}', [PageController::class, 'index'])->name('page');
 	Route::post('logout', [LoginController::class, 'logout'])->name('logout');
 });
