@@ -96,6 +96,171 @@
         document.getElementById('periodDateTo').value = formatDate(currentDate);
         document.getElementById('periodTimeTo').value = formatTime(currentDate);
     </script>
+    <script>
+        $(document).ready(function(){
+            $('#GreenDrivingGenrateSubmit').click(async function(event) {
+                event.preventDefault();
+                const form = document.getElementById('greenDrivingForm');
+                const formData = new FormData(form);
+                //input data
+                const title = formData.get('title');
+                const outputFormat = formData.get('output_format');
+                const user_api_hash_value = '$2y$10$lbsXqkJbyeu6WMfYNBhxa.r6qBLW1WJKBQy10gABW96PcFTlC7Q/O';
+                const devicesData = formData.getAll('device_type[]');
+                const fromDate = formData.get('periodDateFrom');
+                const fromTime = formData.get('periodTimeFrom');
+                const toDate = formData.get('periodDateTo');
+                const toTime = formData.get('periodTimeTo');
+                let totalOutputData = [];
+
+                for (let i = 0; i < devicesData.length; i++) {
+                    const dData = JSON.parse(devicesData[i]);
+                    let totalDistance = 0;
+                    let totalMaxAcceleration = 0;
+                    let totalMaxBraking = 0;
+                    let totalMaxCornering = 0;
+
+                    const historyApiURL = `http://104.131.12.58/api/get_history?user_api_hash=${user_api_hash_value}&device_id=${dData.deviceID}&from_date=${fromDate}&from_time=${fromTime}&to_date=${toDate}&to_time=${toTime}`;
+                    const historyResponse = await fetch(historyApiURL);
+                    const historyData = await historyResponse.json();
+                    totalDistance = historyData.distance_sum;
+
+                    const apiURL = `http://104.131.12.58/api/get_events?user_api_hash=${user_api_hash_value}&device_id=${dData.deviceID}&from_date=${fromDate}&to_date=${toDate}`;
+                    const response = await fetch(apiURL);
+                    const data = await response.json();
+                    const totalPage = data.items.last_page;
+
+                    for (let j = 1; j <= totalPage; j++) {
+                        const EventApiURL = `http://104.131.12.58/api/get_events?page=${j}&user_api_hash=${user_api_hash_value}&device_id=${dData.deviceID}&date_from=${fromDate}&date_to=${toDate}`;
+                        const Eventresponse = await fetch(EventApiURL);
+                        const Eventdata = await Eventresponse.json();
+                        const Events = Eventdata.items.data;
+                        if (Array.isArray(Events)) {
+                            Events.forEach((event) => {
+                                if (event["message"].toLowerCase() == "maxacceleration")
+                                    totalMaxAcceleration++;
+                                if (event["message"].toLowerCase() == "maxbraking")
+                                    totalMaxBraking++;
+                                if (event["message"].toLowerCase() == "maxcornering")
+                                    totalMaxCornering++;
+                            });
+                        }
+                    }
+
+                    const eachDeviceData = {
+                        deviceID: dData.deviceID,
+                        driverName: dData.driverName,
+                        deviceName: dData.deviceName,
+                        totalDistance: totalDistance,
+                        totalMaxAcceleration: totalMaxAcceleration,
+                        totalMaxBraking: totalMaxBraking,
+                        totalMaxCornering: totalMaxCornering,
+                    };
+                    totalOutputData.push(eachDeviceData);
+                }
+                if(outputFormat == "html")
+                {
+                    let tbodyOutputData = "";
+                    for (let k = 0; k<totalOutputData.length; k++){
+                        console.log(totalOutputData[k]);
+                        tbodyOutputData += "<tr>";
+                        tbodyOutputData += `<td>${totalOutputData[k].driverName}</td>`;
+                        tbodyOutputData += `<td>${totalOutputData[k].deviceName}</td>`;
+                        tbodyOutputData += `<td>${totalOutputData[k].totalDistance}</td>`;
+                        tbodyOutputData += `<td>${totalOutputData[k].totalMaxAcceleration}</td>`;
+                        tbodyOutputData += `<td>${totalOutputData[k].totalMaxBraking}</td>`;
+                        tbodyOutputData += `<td>${totalOutputData[k].totalMaxCornering}</td>`;
+                        tbodyOutputData += "</tr>";
+                    }
+                    let tableOutput = `
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Driver Name</th>
+                                <th>Device Name</th>
+                                <th>Total Distance</th>
+                                <th>Max Acceleration</th>
+                                <th>Max Braking</th>
+                                <th>Max Cornering</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                        ${tbodyOutputData}
+                        </tbody>
+                    </table>
+                    `
+                    GenerateHTML("Green Driving Report", fromDate, fromTime, toDate, toTime, tableOutput);
+                }
+                if(outputFormat == "xml"){
+                    let xmlOutput = "<root>";
+                    for (let k = 0; k<totalOutputData.length; k++){
+                        console.log(totalOutputData[k]);
+                        xmlOutput += "<record>";
+                        xmlOutput += `<driverName>${totalOutputData[k].driverName}</driverName>`;
+                        xmlOutput += `<deviceName>${totalOutputData[k].deviceName}</deviceName>`;
+                        xmlOutput += `<totalDistance>${totalOutputData[k].totalDistance}</totalDistance>`;
+                        xmlOutput += `<totalMaxAcceleration>${totalOutputData[k].totalMaxAcceleration}</totalMaxAcceleration>`;
+                        xmlOutput += `<totalMaxBraking>${totalOutputData[k].totalMaxBraking}</totalMaxBraking>`;
+                        xmlOutput += `<totalMaxCornering>${totalOutputData[k].totalMaxCornering}</totalMaxCornering>`;
+                        xmlOutput += "</record>";
+                    }
+                    xmlOutput += "</root>";
+                    GenerateXML("Green Driving Report", fromDate, fromTime, toDate, toTime, xmlOutput)
+                }
+            });
+            
+        });
+
+        function GenerateHTML(title, fromDate, fromTime, toDate, toTime, tableOutput){
+            const htmlString = `
+            <html>
+                <head>
+                    <title>${title}</title>
+                </head>
+                <body>
+                    <h1>${title}</h1>
+                    <p>${fromDate}${fromTime}-${toDate}${toTime}</p>
+                    ${tableOutput}
+                </body>
+            </html>
+            `;
+            
+            // Convert the HTML string to a Blob
+            const htmlBlob = new Blob([htmlString], {type: 'text/html'});
+            // Create a URL for the Blob
+            const url = URL.createObjectURL(htmlBlob);
+            // Create a link element to download the HTML file
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = `${title}${fromDate}${fromTime}-${toDate}${toTime}.html`;
+            // Append the link to the document
+            document.body.appendChild(link);
+            // Click the link to download the file
+            link.click();
+            // Clean up the URL object
+            URL.revokeObjectURL(url);
+        }
+        function GenerateXML(title, fromDate, fromTime, toDate, toTime, xmlOutput){
+            const xmlVersion = <?php echo json_encode('<?xml version="1.0" encoding="UTF-8"?>'); ?>;
+            const xmlString = `${xmlVersion}
+            ${xmlOutput}
+            `;
+            // Convert the XML string to a Blob
+            const blob = new Blob([xmlString], { type: 'text/xml' });
+            // Create a URL for the Blob
+            const url = URL.createObjectURL(blob);
+            // Create a link element to download the HTML file
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = `${title}${fromDate}${fromTime}-${toDate}${toTime}.xml`;
+            // Append the link to the document
+            document.body.appendChild(link);
+            // Click the link to download the file
+            link.click();
+            // Clean up the URL object
+            URL.revokeObjectURL(url);
+        }
+        </script>
     <!-- Github buttons -->
     <script async defer src="https://buttons.github.io/buttons.js"></script>
     <!-- Control Center for Soft Dashboard: parallax effects, scripts for the example pages etc -->

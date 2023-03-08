@@ -9,7 +9,7 @@
         <div class="row">
             <div class="col-md-12">
                 <div class="card">
-                    <form role="form" method="POST" action={{ route('generateReport.green-driving') }} enctype="multipart/form-data">
+                    <form role="form" id="greenDrivingForm" method="POST" action={{ route('generateReport.green-driving') }} enctype="multipart/form-data">
                         @csrf
                         <div class="card-body">
                             <div class="row">
@@ -26,7 +26,7 @@
                                         <label for="output_format" class="form-control-label">Format</label>
                                         <select class="form-select" name="output_format">
                                             <option value="html">HTML</option>
-                                            <option value="jsx">JSX</option>
+                                            <option value="xml">XML</option>
                                             <option value="csv">CSV</option>
                                             <option value="pdf">PDF</option>
                                         </select>
@@ -37,7 +37,7 @@
                                         <label for="device_type" class="form-control-label">Devices</label>
                                         <select class="form-select" name="device_type[]" multiple="true" id="deviceType" required>
                                             @foreach($devices as $device)
-                                            <option value="{{base64_encode(serialize(['deviceID'=>$device['id'], 'deviceName'=>$device['name'], 'driverID'=>$device['driver_data']['id'], 'driverName' => $device['driver']]))}}">{{$device["name"]}}</option>
+                                            <option value='{"deviceID" : {{$device["id"]}}, "deviceName" : "{{$device["name"]}}", "driverID" : "{{$device["driver_data"]["id"]}}", "driverName" : "{{$device["driver"]}}"}'>{{$device["name"]}}</option>
                                             @endforeach
                                         </select>
                                     </div>
@@ -83,7 +83,7 @@
                                 </div>
                         </div>
                         <div class="card-footer p-0">
-                            <button type="submit" class="btn btn-primary btn-sm ms-auto me-3">Gemerate</button>
+                            <button id="GreenDrivingGenrateSubmit" class="btn btn-primary btn-sm ms-auto me-3">Generate</button>
                             <button type="submit" class="btn btn-grey btn-sm ms-auto me-3">Save</button>
                             <button type="submit" class="btn btn-grey btn-sm ms-auto me-3">New</button>
                             <button type="submit" class="btn btn-grey btn-sm ms-auto me-3">Cancel</button>

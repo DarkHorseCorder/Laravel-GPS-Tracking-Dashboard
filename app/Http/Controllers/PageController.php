@@ -225,7 +225,7 @@ class PageController extends Controller
             $HistoryResponse = Http::timeout(180)->get($HistoryapiURL);
             $HistoryJsonData = $HistoryResponse->json();
             $prevTemp1 = $prevTemp2 = $prevTemp3 = $prevTemp4 = 0;
-            $curTemp1 = $curTemp2 = $curTemp3 = $curTemp4 = "No data";
+            $curTemp1 = $curTemp2 = $curTemp3 = $curTemp4 = "-";
             $recordDate = 0;
             $device_name = $HistoryJsonData["device"]["name"];
             foreach($HistoryJsonData["items"] as $HistoryItems){

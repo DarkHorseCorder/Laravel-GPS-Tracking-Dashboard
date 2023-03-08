@@ -32,7 +32,7 @@
                                 <td>{{$outPutData['totalDistance']}}</td>
                                 <td>Speed Count</td>
                                 <td>Speed Duration</td>
-                                <td>{{$outPutData['totalFuelUsed']}}</td>
+                                <td>{{$outPutData['totalMaxAcceleration']}}</td>
                                 <td>{{$outPutData['totalMaxBraking']}}</td>
                                 <td>{{$outPutData['totalMaxCornering']}}</td>
                                 <td>Driver Score</td>
