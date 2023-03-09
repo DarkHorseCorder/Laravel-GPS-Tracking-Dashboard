@@ -41,6 +41,9 @@ class PageController extends Controller
     {
         return view("pages.sign-up-static");
     }
+    public function user_management(){
+        return view("pages.user-management2");
+    }
     public function greendriving()
     {
         $response = Http::get('104.131.12.58/api/get_devices?user_api_hash=$2y$10$lbsXqkJbyeu6WMfYNBhxa.r6qBLW1WJKBQy10gABW96PcFTlC7Q/O');
