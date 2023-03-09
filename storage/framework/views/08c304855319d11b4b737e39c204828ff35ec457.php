@@ -400,7 +400,171 @@
                     GenerateCSV(title, fromDate, fromTime, toDate, toTime, totalOutputData)
                 }
                 document.getElementById('loadingScreen').style.display = "none";
-            })
+            });
+            $('#TemperatureGenerateSubmit').click(async function(event) {
+                event.preventDefault();
+                document.getElementById('loadingScreen').style.display = "flex";
+                const form = document.getElementById('temperatureForm');
+                const formData = new FormData(form);
+                //input data
+                const title = formData.get('title');
+                const outputFormat = formData.get('output_format');
+                const user_api_hash_value = '$2y$10$lbsXqkJbyeu6WMfYNBhxa.r6qBLW1WJKBQy10gABW96PcFTlC7Q/O';
+                const devicesData = formData.getAll('device_type[]');
+                const fromDate = formData.get('periodDateFrom');
+                const fromTime = formData.get('periodTimeFrom');
+                const toDate = formData.get('periodDateTo');
+                const toTime = formData.get('periodTimeTo');
+                let totalOutputData = [];
+                for (let i = 0; i < devicesData.length; i++) {
+                    const dData = JSON.parse(devicesData[i]);
+                    let HistoryapiURL = `http://104.131.12.58/api/get_history?user_api_hash=${user_api_hash_value}&device_id=${dData.deviceID}&from_date=${fromDate}&from_time=${fromTime}&to_date=${toDate}&to_time=${toTime}`;
+                    let HistoryResponse = await fetch(HistoryapiURL, { timeout: 180000 });
+                    let HistoryJsonData = await HistoryResponse.json();
+                    let prevTemp1 = prevTemp2 = prevTemp3 = prevTemp4 = 0;
+                    let curTemp1 = curTemp2 = curTemp3 = curTemp4 = "-";
+                    let recordDate = 0;
+                    let device_name = HistoryJsonData.device.name;
+
+                    for (let j = 0; j < HistoryJsonData.items.length; j++) {
+                        let HistoryItems = HistoryJsonData.items[j];
+
+                        for (let k = 0; k < HistoryItems.items.length; k++) {
+                            let HistoryItem = HistoryItems.items[k];
+
+                            if (HistoryItem.other && HistoryItem.other !== "") 
+                            {
+                                let parser = new DOMParser();
+                                let xml = parser.parseFromString(HistoryItem.other, "text/xml");
+
+                                if (xml.getElementsByTagName("temp1")[0]) {
+                                    curTemp1 = parseFloat(xml.getElementsByTagName("temp1")[0].textContent);
+                                }
+                                if (xml.getElementsByTagName("temp5")[0]) {
+                                    curTemp1 = parseFloat(xml.getElementsByTagName("temp5")[0].textContent);
+                                }
+                                if (xml.getElementsByTagName("temp2")[0]) {
+                                    curTemp2 = parseFloat(xml.getElementsByTagName("temp2")[0].textContent);
+                                }
+                                if (xml.getElementsByTagName("temp6")[0]) {
+                                    curTemp2 = parseFloat(xml.getElementsByTagName("temp6")[0].textContent);
+                                }
+                                if (xml.getElementsByTagName("temp3")[0]) {
+                                    curTemp3 = parseFloat(xml.getElementsByTagName("temp3")[0].textContent);
+                                }
+                                if (xml.getElementsByTagName("temp7")[0]) {
+                                    curTemp3 = parseFloat(xml.getElementsByTagName("temp7")[0].textContent);
+                                }
+                                if (xml.getElementsByTagName("temp4")[0]) {
+                                    curTemp4 = parseFloat(xml.getElementsByTagName("temp4")[0].textContent);
+                                }
+                                if (xml.getElementsByTagName("temp8")[0]) {
+                                    curTemp4 = parseFloat(xml.getElementsByTagName("temp8")[0].textContent);
+                                }
+                                if (prevTemp1 !== curTemp1 || prevTemp2 !== curTemp2 || prevTemp3 !== curTemp3 || prevTemp4 !== curTemp4) 
+                                {
+                                    prevTemp1 = curTemp1;
+                                    prevTemp2 = curTemp2;
+                                    prevTemp3 = curTemp3;
+                                    prevTemp4 = curTemp4;
+                                    recordDate = HistoryItem.raw_time;
+                                    let data = {
+                                    deviceName: device_name,
+                                    recordDate: recordDate,
+                                    temp1: prevTemp1,
+                                    temp2: prevTemp2,
+                                    temp3: prevTemp3,
+                                    temp4: prevTemp4,
+                                    };
+                                    totalOutputData.push(data);
+                                }
+                            }
+                        }
+                    }
+                }
+                if(outputFormat == "html")
+                {
+                    let tbodyOutputData = "";
+                    for (let k = 0; k<totalOutputData.length; k++){
+                        tbodyOutputData += "<tr>";
+                        tbodyOutputData += `<td>${totalOutputData[k].deviceName}</td>`;
+                        tbodyOutputData += `<td>${totalOutputData[k].recordDate}</td>`;
+                        tbodyOutputData += `<td>${totalOutputData[k].temp1}</td>`;
+                        tbodyOutputData += `<td>${totalOutputData[k].temp2}</td>`;
+                        tbodyOutputData += `<td>${totalOutputData[k].temp3}</td>`;
+                        tbodyOutputData += `<td>${totalOutputData[k].temp4}</td>`;
+                        tbodyOutputData += "</tr>";
+                    }
+                    let tableOutput = `
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Device Name</th>
+                                <th>Record Date</th>
+                                <th>Temp1</th>
+                                <th>Temp2</th>
+                                <th>Temp3</th>
+                                <th>Temp4</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                        ${tbodyOutputData}
+                        </tbody>
+                    </table>
+                    `
+                    GenerateHTML(title, fromDate, fromTime, toDate, toTime, tableOutput);
+                }
+                if(outputFormat == "xml"){
+                    let xmlOutput = "<root>";
+                    for (let k = 0; k<totalOutputData.length; k++){
+                        xmlOutput += "<record>";
+                        xmlOutput += `<deviceName>${totalOutputData[k].deviceName}</deviceName>`;
+                        xmlOutput += `<recordDate>${totalOutputData[k].recordDate}</recordDate>`;
+                        xmlOutput += `<temp1>${totalOutputData[k].temp1}</temp1>`;
+                        xmlOutput += `<temp2>${totalOutputData[k].temp2}</temp2>`;
+                        xmlOutput += `<temp3>${totalOutputData[k].temp3}</temp3>`;
+                        xmlOutput += `<temp4>${totalOutputData[k].temp4}</temp4>`;
+                        xmlOutput += "</record>";
+                    }
+                    xmlOutput += "</root>";
+                    GenerateXML(title, fromDate, fromTime, toDate, toTime, xmlOutput)
+                }
+                if(outputFormat == "pdf"){
+                    let tbodyOutputData = "";
+                    for (let k = 0; k<totalOutputData.length; k++){
+                        tbodyOutputData += "<tr>";
+                        tbodyOutputData += `<td>${totalOutputData[k].deviceName}</td>`;
+                        tbodyOutputData += `<td>${totalOutputData[k].recordDate}</td>`;
+                        tbodyOutputData += `<td>${totalOutputData[k].temp1}</td>`;
+                        tbodyOutputData += `<td>${totalOutputData[k].temp2}</td>`;
+                        tbodyOutputData += `<td>${totalOutputData[k].temp3}</td>`;
+                        tbodyOutputData += `<td>${totalOutputData[k].temp4}</td>`;
+                        tbodyOutputData += "</tr>";
+                    }
+                    let tableOutput = `
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Device Name</th>
+                                <th>Record Date</th>
+                                <th>Temp1</th>
+                                <th>Temp2</th>
+                                <th>Temp3</th>
+                                <th>Temp4</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                        ${tbodyOutputData}
+                        </tbody>
+                    </table>
+                    `
+                    GeneratePDF(title, fromDate, fromTime, toDate, toTime, tableOutput)
+                }
+                if(outputFormat == "csv"){
+                    GenerateCSV(title, fromDate, fromTime, toDate, toTime, totalOutputData)
+                }
+                document.getElementById('loadingScreen').style.display = "none";
+            });
         });
 
         function GenerateHTML(title, fromDate, fromTime, toDate, toTime, tableOutput){
@@ -472,7 +636,6 @@
             // Convert the HTML to PDF using the html2pdf library
             html2pdf().set(opt).from(htmlOutput).save();
         }
-
         function GenerateCSV(title, fromDate, fromTime, toDate, toTime, data){
             const titleKeys = Object.keys(data[0]);
             const refinedData = [];

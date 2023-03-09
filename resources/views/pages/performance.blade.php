@@ -9,7 +9,7 @@
         <div class="row">
             <div class="col-md-12">
                 <div class="card">
-                    <form role="form" method="POST" id="performanceForm" enctype="multipart/form-data">
+                    <form role="form" id="performanceForm" enctype="multipart/form-data">
                         @csrf
                         <div class="card-body">
                             <div class="row">
@@ -26,7 +26,7 @@
                                         <label for="output_format" class="form-control-label">Format</label>
                                         <select class="form-select" name="output_format">
                                             <option value="html">HTML</option>
-                                            <option value="jsx">JSX</option>
+                                            <option value="xml">XML</option>
                                             <option value="csv">CSV</option>
                                             <option value="pdf">PDF</option>
                                         </select>
