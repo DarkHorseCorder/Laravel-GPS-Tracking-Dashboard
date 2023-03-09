@@ -25,7 +25,14 @@
 </head>
 
 <body class="<?php echo e($class ?? ''); ?>">
-
+    <div id="loadingScreen">
+        <div class="progressIndicator">
+            <p style="text-align : center">Analyzing Data...</p>
+            <div class="progress customProgress">
+                <div class="progress-bar progress-bar-striped progress-bar-animated" role="progressbar" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100" style="width: 100%"></div>
+            </div>
+        </div>
+    </div>
     <?php if(auth()->guard()->guest()): ?>
         <?php echo $__env->yieldContent('content'); ?>
     <?php endif; ?>
@@ -97,6 +104,7 @@
         $(document).ready(function(){
             $('#GreenDrivingGenrateSubmit').click(async function(event) {
                 event.preventDefault();
+                document.getElementById('loadingScreen').style.display = "flex";
                 const form = document.getElementById('greenDrivingForm');
                 const formData = new FormData(form);
                 //input data
@@ -239,6 +247,7 @@
                 if(outputFormat == "csv"){
                     GenerateCSV("Green Driving Report", fromDate, fromTime, toDate, toTime, totalOutputData)
                 }
+                document.getElementById('loadingScreen').style.display = "none";
             });
             
         });

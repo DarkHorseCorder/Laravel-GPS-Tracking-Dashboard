@@ -84,9 +84,9 @@
                         </div>
                         <div class="card-footer p-0">
                             <button id="GreenDrivingGenrateSubmit" class="btn btn-primary btn-sm ms-auto me-3">Generate</button>
-                            <button type="submit" class="btn btn-grey btn-sm ms-auto me-3">Save</button>
+                            <!-- <button type="submit" class="btn btn-grey btn-sm ms-auto me-3">Save</button>
                             <button type="submit" class="btn btn-grey btn-sm ms-auto me-3">New</button>
-                            <button type="submit" class="btn btn-grey btn-sm ms-auto me-3">Cancel</button>
+                            <button type="submit" class="btn btn-grey btn-sm ms-auto me-3">Cancel</button> -->
                         </div>
                     </form>
                 </div>

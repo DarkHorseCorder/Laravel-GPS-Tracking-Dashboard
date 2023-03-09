@@ -89,10 +89,10 @@
                                 </div>
                         </div>
                         <div class="card-footer p-0">
-                            <button type="submit" class="btn btn-primary btn-sm ms-auto me-3">Gemerate</button>
-                            <button type="submit" class="btn btn-grey btn-sm ms-auto me-3">Save</button>
+                            <button id="PerformanceGenerateSubmit" class="btn btn-primary btn-sm ms-auto me-3">Generate</button>
+                            <!-- <button type="submit" class="btn btn-grey btn-sm ms-auto me-3">Save</button>
                             <button type="submit" class="btn btn-grey btn-sm ms-auto me-3">New</button>
-                            <button type="submit" class="btn btn-grey btn-sm ms-auto me-3">Cancel</button>
+                            <button type="submit" class="btn btn-grey btn-sm ms-auto me-3">Cancel</button> -->
                         </div>
                     </form>
                 </div>
