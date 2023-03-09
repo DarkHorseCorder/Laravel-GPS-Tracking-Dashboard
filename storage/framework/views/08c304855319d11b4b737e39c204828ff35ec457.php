@@ -53,13 +53,10 @@
     <script src="assets/js/core/popper.min.js"></script>
     <script src="assets/js/plugins/perfect-scrollbar.min.js"></script>
     <script src="assets/js/plugins/smooth-scrollbar.min.js"></script>
-    <!-- <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.0/jquery.min.js"></script> -->
-    <!-- <script src="assets/js/core/bootstrap.min.js"></script> -->
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.3/jquery.min.js"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
-
-    <!-- <script src="assets/js/plugins/jquery.multi-select.js"></script> -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-multiselect/0.9.14/js/bootstrap-multiselect.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.9.3/html2pdf.bundle.min.js" integrity="sha512-YcsIPGdhPK4P/uRW6/sruonlYj+Q7UHWeKfTAkBW+g83NKM+jMJFJ4iAPfSnVp7BKD4dKMHmVSvICUbE/V1sSw==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
 
     <script>
         var win = navigator.platform.indexOf('Win') > -1;
@@ -207,6 +204,41 @@
                     xmlOutput += "</root>";
                     GenerateXML("Green Driving Report", fromDate, fromTime, toDate, toTime, xmlOutput)
                 }
+                if(outputFormat == "pdf"){
+                    let tbodyOutputData = "";
+                    for (let k = 0; k<totalOutputData.length; k++){
+                        console.log(totalOutputData[k]);
+                        tbodyOutputData += "<tr>";
+                        tbodyOutputData += `<td>${totalOutputData[k].driverName}</td>`;
+                        tbodyOutputData += `<td>${totalOutputData[k].deviceName}</td>`;
+                        tbodyOutputData += `<td>${totalOutputData[k].totalDistance}</td>`;
+                        tbodyOutputData += `<td>${totalOutputData[k].totalMaxAcceleration}</td>`;
+                        tbodyOutputData += `<td>${totalOutputData[k].totalMaxBraking}</td>`;
+                        tbodyOutputData += `<td>${totalOutputData[k].totalMaxCornering}</td>`;
+                        tbodyOutputData += "</tr>";
+                    }
+                    let tableOutput = `
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Driver Name</th>
+                                <th>Device Name</th>
+                                <th>Total Distance</th>
+                                <th>Max Acceleration</th>
+                                <th>Max Braking</th>
+                                <th>Max Cornering</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                        ${tbodyOutputData}
+                        </tbody>
+                    </table>
+                    `
+                    GeneratePDF("Green Driving Report", fromDate, fromTime, toDate, toTime, tableOutput)
+                }
+                if(outputFormat == "csv"){
+                    GenerateCSV("Green Driving Report", fromDate, fromTime, toDate, toTime, totalOutputData)
+                }
             });
             
         });
@@ -245,7 +277,6 @@
             const xmlString = `${xmlVersion}
             ${xmlOutput}
             `;
-            
             // Convert the XML string to a Blob
             const blob = new Blob([xmlString], { type: 'text/xml' });
             // Create a URL for the Blob
@@ -260,6 +291,51 @@
             link.click();
             // Clean up the URL object
             URL.revokeObjectURL(url);
+        }
+        function GeneratePDF(title, fromDate, fromTime, toDate, toTime, htmlOutput){
+            var opt = {
+                margin: 1,
+                filename: `${title}${fromDate}${fromTime}-${toDate}${toTime}.pdf`,
+                image: {
+                type: 'jpeg',
+                quality: 0.98
+                },
+                html2canvas: {
+                scale: 2
+                },
+                jsPDF: {
+                unit: 'in',
+                format: 'letter',
+                orientation: 'portrait'
+                }
+            };
+            // Convert the HTML to PDF using the html2pdf library
+            html2pdf().set(opt).from(htmlOutput).save();
+        }
+
+        function GenerateCSV(title, fromDate, fromTime, toDate, toTime, data){
+            const titleKeys = Object.keys(data[0]);
+            const refinedData = [];
+            refinedData.push(titleKeys);
+            console.log(data)
+            data.forEach(item => {
+                refinedData.push(Object.values(item));
+            })
+            let csvContent = ''
+            refinedData.forEach(row => {
+            csvContent += row.join(',') + '\n'
+            })
+            const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8,' })
+            const objUrl = URL.createObjectURL(blob)
+            const link = document.createElement('a')
+            link.href = objUrl;
+            link.download = `${title}${fromDate}${fromTime}-${toDate}${toTime}.csv`;
+            // Append the link to the document
+            document.body.appendChild(link);
+            // Click the link to download the file
+            link.click();
+            // Clean up the URL object
+            URL.revokeObjectURL(objUrl);
         }
         </script>
     <!-- Github buttons -->

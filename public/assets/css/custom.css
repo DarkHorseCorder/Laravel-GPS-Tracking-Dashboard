@@ -49,3 +49,7 @@
     font-size: 0.67rem;
     opacity: 0;
 }
+
+#loadingScreen {
+    background-color: #cbd3da;
+}
