@@ -9,7 +9,7 @@
         <div class="row">
             <div class="col-md-12">
                 <div class="card">
-                    <form role="form" id="greenDrivingForm" method="POST" action={{ route('generateReport.green-driving') }} enctype="multipart/form-data">
+                    <form role="form" id="greenDrivingForm" method="POST" enctype="multipart/form-data">
                         @csrf
                         <div class="card-body">
                             <div class="row">
