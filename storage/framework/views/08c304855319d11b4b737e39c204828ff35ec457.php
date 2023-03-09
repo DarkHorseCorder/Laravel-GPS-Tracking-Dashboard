@@ -194,7 +194,7 @@
                         </tbody>
                     </table>
                     `
-                    GenerateHTML("Green Driving Report", fromDate, fromTime, toDate, toTime, tableOutput);
+                    GenerateHTML(title, fromDate, fromTime, toDate, toTime, tableOutput);
                 }
                 if(outputFormat == "xml"){
                     let xmlOutput = "<root>";
@@ -210,7 +210,7 @@
                         xmlOutput += "</record>";
                     }
                     xmlOutput += "</root>";
-                    GenerateXML("Green Driving Report", fromDate, fromTime, toDate, toTime, xmlOutput)
+                    GenerateXML(title, fromDate, fromTime, toDate, toTime, xmlOutput)
                 }
                 if(outputFormat == "pdf"){
                     let tbodyOutputData = "";
@@ -242,14 +242,165 @@
                         </tbody>
                     </table>
                     `
-                    GeneratePDF("Green Driving Report", fromDate, fromTime, toDate, toTime, tableOutput)
+                    GeneratePDF(title, fromDate, fromTime, toDate, toTime, tableOutput)
                 }
                 if(outputFormat == "csv"){
-                    GenerateCSV("Green Driving Report", fromDate, fromTime, toDate, toTime, totalOutputData)
+                    GenerateCSV(title, fromDate, fromTime, toDate, toTime, totalOutputData)
                 }
                 document.getElementById('loadingScreen').style.display = "none";
             });
-            
+            $('#PerformanceGenerateSubmit').click(async function(event) {
+                event.preventDefault();
+                document.getElementById('loadingScreen').style.display = "flex";
+                const form = document.getElementById('performanceForm');
+                const formData = new FormData(form);
+                //input data
+                const title = formData.get('title');
+                const outputFormat = formData.get('output_format');
+                const user_api_hash_value = '$2y$10$lbsXqkJbyeu6WMfYNBhxa.r6qBLW1WJKBQy10gABW96PcFTlC7Q/O';
+                const devicesData = formData.getAll('device_type[]');
+                const fromDate = formData.get('periodDateFrom');
+                const fromTime = formData.get('periodTimeFrom');
+                const toDate = formData.get('periodDateTo');
+                const toTime = formData.get('periodTimeTo');
+                const gallonPrice = formData.get('gallonPrice');
+                let totalOutputData = [];
+
+                for (let i = 0; i < devicesData.length; i++) {
+                    const dData = JSON.parse(devicesData[i]);
+                    let totalDistance = 0;
+                    let totalFuelUsed = 0;
+                    let unitPerformance = 0;
+                    let kilometerCost = 0;
+                    let totalRouteCost = 0;
+                    const historyApiURL = `http://104.131.12.58/api/get_history?user_api_hash=${user_api_hash_value}&device_id=${dData.deviceID}&from_date=${fromDate}&from_time=${fromTime}&to_date=${toDate}&to_time=${toTime}`;
+                    const historyResponse = await fetch(historyApiURL);
+                    const historyData = await historyResponse.json();
+                    totalDistance = historyData.distance_sum;
+                    const HistoryRecordItems = historyData.items;
+                    let lastRecordXML = new DOMParser().parseFromString(HistoryRecordItems[0]['items'][0]['other'], "text/xml");
+                    if (lastRecordXML.getElementsByTagName('fuelused').length > 0) {
+                        let lastFuelRecord = parseInt(lastRecordXML.getElementsByTagName('fuelused')[0].textContent);
+                        let initRecord = HistoryRecordItems[HistoryRecordItems.length - 1];
+                        let initRecordXML = new DOMParser().parseFromString(initRecord['items'][0]['other'], "text/xml");
+                        let initFuelRecord = parseInt(initRecordXML.getElementsByTagName('fuelused')[0].textContent);
+                        totalFuelUsed = Math.round((initFuelRecord - lastFuelRecord) * 0.264172, 1);
+                        if (totalFuelUsed === 0) {
+                            unitPerformance = "No data";
+                            kilometerCost = "No data";
+                            totalRouteCost = "No data";
+                        } else {
+                            distanceValue = parseFloat(totalDistance.replace(/[^\d.]/g, ''));
+                            unitPerformance = (totalFuelUsed / distanceValue).toFixed(1);
+                            kilometerCost = (totalFuelUsed * gallonPrice / distanceValue).toFixed(1);
+                            totalRouteCost = (totalFuelUsed * gallonPrice).toFixed(1);
+                        }
+                    } else {
+                        totalFuelUsed = "No data";
+                        unitPerformance = "No data";
+                        kilometerCost = "No data";
+                        totalRouteCost = "No data";
+                    }
+                    let eachDeviceData = {
+                        deviceID: dData.deviceID,
+                        driverName: dData.driverName,
+                        deviceName: dData.deviceName,
+                        totalDistance: totalDistance,
+                        totalFuelUsed: totalFuelUsed,
+                        unitPerformance: unitPerformance,
+                        kilometerCost: kilometerCost,
+                        totalRouteCost: totalRouteCost
+                    };
+                    totalOutputData.push(eachDeviceData);
+                }
+                if(outputFormat == "html")
+                {
+                    let tbodyOutputData = "";
+                    for (let k = 0; k<totalOutputData.length; k++){
+                        tbodyOutputData += "<tr>";
+                        tbodyOutputData += `<td>${totalOutputData[k].driverName}</td>`;
+                        tbodyOutputData += `<td>${totalOutputData[k].deviceName}</td>`;
+                        tbodyOutputData += `<td>${totalOutputData[k].totalDistance}</td>`;
+                        tbodyOutputData += `<td>${totalOutputData[k].totalFuelUsed}</td>`;
+                        tbodyOutputData += `<td>${totalOutputData[k].unitPerformance}</td>`;
+                        tbodyOutputData += `<td>${totalOutputData[k].kilometerCost}</td>`;
+                        tbodyOutputData += `<td>${totalOutputData[k].totalRouteCost}</td>`;
+                        tbodyOutputData += "</tr>";
+                    }
+                    let tableOutput = `
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Driver Name</th>
+                                <th>Device Name</th>
+                                <th>Total Distance</th>
+                                <th>Total Fuel Used</th>
+                                <th>Unit Performance</th>
+                                <th>Cost per Kilometer</th>
+                                <th>Total Cost</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                        ${tbodyOutputData}
+                        </tbody>
+                    </table>
+                    `
+                    GenerateHTML(title, fromDate, fromTime, toDate, toTime, tableOutput);
+                }
+                if(outputFormat == "xml"){
+                    let xmlOutput = "<root>";
+                    for (let k = 0; k<totalOutputData.length; k++){
+                        xmlOutput += "<record>";
+                        xmlOutput += `<driverName>${totalOutputData[k].driverName}</driverName>`;
+                        xmlOutput += `<deviceName>${totalOutputData[k].deviceName}</deviceName>`;
+                        xmlOutput += `<totalDistance>${totalOutputData[k].totalDistance}</totalDistance>`;
+                        xmlOutput += `<totalFuelUsed>${totalOutputData[k].totalFuelUsed}</totalFuelUsed>`;
+                        xmlOutput += `<unitPerformance>${totalOutputData[k].unitPerformance}</unitPerformance>`;
+                        xmlOutput += `<kilometerCost>${totalOutputData[k].kilometerCost}</kilometerCost>`;
+                        xmlOutput += `<totalRouteCost>${totalOutputData[k].totalRouteCost}</totalRouteCost>`;
+                        xmlOutput += "</record>";
+                    }
+                    xmlOutput += "</root>";
+                    GenerateXML(title, fromDate, fromTime, toDate, toTime, xmlOutput)
+                }
+                if(outputFormat == "pdf"){
+                    let tbodyOutputData = "";
+                    for (let k = 0; k<totalOutputData.length; k++){
+                        tbodyOutputData += "<tr>";
+                        tbodyOutputData += `<td>${totalOutputData[k].driverName}</td>`;
+                        tbodyOutputData += `<td>${totalOutputData[k].deviceName}</td>`;
+                        tbodyOutputData += `<td>${totalOutputData[k].totalDistance}</td>`;
+                        tbodyOutputData += `<td>${totalOutputData[k].totalFuelUsed}</td>`;
+                        tbodyOutputData += `<td>${totalOutputData[k].unitPerformance}</td>`;
+                        tbodyOutputData += `<td>${totalOutputData[k].kilometerCost}</td>`;
+                        tbodyOutputData += `<td>${totalOutputData[k].totalRouteCost}</td>`;
+                        tbodyOutputData += "</tr>";
+                    }
+                    let tableOutput = `
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Driver Name</th>
+                                <th>Device Name</th>
+                                <th>Total Distance</th>
+                                <th>Total Fuel Used</th>
+                                <th>Unit Performance</th>
+                                <th>Cost per Kilometer</th>
+                                <th>Total Cost</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                        ${tbodyOutputData}
+                        </tbody>
+                    </table>
+                    `
+                    GeneratePDF(title, fromDate, fromTime, toDate, toTime, tableOutput)
+                }
+                if(outputFormat == "csv"){
+                    GenerateCSV(title, fromDate, fromTime, toDate, toTime, totalOutputData)
+                }
+                document.getElementById('loadingScreen').style.display = "none";
+            })
         });
 
         function GenerateHTML(title, fromDate, fromTime, toDate, toTime, tableOutput){

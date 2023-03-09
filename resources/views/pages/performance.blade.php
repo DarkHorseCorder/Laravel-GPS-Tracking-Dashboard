@@ -9,7 +9,7 @@
         <div class="row">
             <div class="col-md-12">
                 <div class="card">
-                    <form role="form" method="POST" action={{ route('generateReport.performance') }} enctype="multipart/form-data">
+                    <form role="form" method="POST" id="performanceForm" enctype="multipart/form-data">
                         @csrf
                         <div class="card-body">
                             <div class="row">
@@ -37,7 +37,7 @@
                                         <label for="device_type" class="form-control-label">Devices</label>
                                         <select class="form-select" name="device_type[]" multiple="true" id="deviceType" required>
                                             @foreach($devices as $device)
-                                            <option value="{{base64_encode(serialize(['deviceID'=>$device['id'], 'deviceName'=>$device['name'], 'driverID'=>$device['driver_data']['id'], 'driverName' => $device['driver']]))}}">{{$device["name"]}}</option>
+                                            <option value='{"deviceID" : {{$device["id"]}}, "deviceName" : "{{$device["name"]}}", "driverID" : "{{$device["driver_data"]["id"]}}", "driverName" : "{{$device["driver"]}}"}'>{{$device["name"]}}</option>
                                             @endforeach
                                         </select>
                                     </div>
