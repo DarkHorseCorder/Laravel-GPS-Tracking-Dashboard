@@ -70,3 +70,7 @@
 .customProgress{
     height : 15px;
 }
+.toast-error {
+    background-color: #F44336 !important;
+    color: #fff !important;
+}

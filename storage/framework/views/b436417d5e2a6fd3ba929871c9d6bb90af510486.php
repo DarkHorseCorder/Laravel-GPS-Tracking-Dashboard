@@ -1,3 +1,5 @@
+
+
 <?php $__env->startSection('content'); ?>
     <main class="main-content  mt-0">
         <section>
@@ -14,6 +16,14 @@
                                     <form role="form" method="POST" action="<?php echo e(route('login.perform')); ?>">
                                         <?php echo csrf_field(); ?>
                                         <?php echo method_field('post'); ?>
+                                        <?php $__errorArgs = ['permission'];
+$__bag = $errors->getBag($__errorArgs[1] ?? 'default');
+if ($__bag->has($__errorArgs[0])) :
+if (isset($message)) { $__messageOriginal = $message; }
+$message = $__bag->first($__errorArgs[0]); ?> <p class="text-danger text-xs pt-1"> <?php echo e($message); ?> </p><?php unset($message);
+if (isset($__messageOriginal)) { $message = $__messageOriginal; }
+endif;
+unset($__errorArgs, $__bag); ?>
                                         <div class="flex flex-col mb-3">
                                             <input type="email" name="email" class="form-control form-control-lg" value="<?php echo e(old('email') ?? 'admin@argon.com'); ?>" aria-label="Email">
                                             <?php $__errorArgs = ['email'];
