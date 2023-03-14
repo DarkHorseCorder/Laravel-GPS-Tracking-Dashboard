@@ -29,7 +29,7 @@ class LoginController extends Controller
             'password' => ['required'],
         ]);
         try{
-            $client = new Client();
+            $client = new Client(['timeout' => 180]);
             $response = $client->post('http://104.131.12.58/api/login', [
                 'headers' => [
                     'Content-Type' => 'application/json',
@@ -40,11 +40,10 @@ class LoginController extends Controller
                 ],
             ]);
             $responseData = json_decode($response->getBody()->getContents(), true);
+            //User have to status = 1 and have to have permission to view reports
             if($responseData["status"]==1 && $responseData["permissions"]["reports"]["view"] == true ){
-                // dd($responseData["user_api_hash"]);
                 Auth::attempt(['email' => "admin@argon.com", 'password' => "secret"]);
                 session(['user_api_hash' => $responseData["user_api_hash"]]);
-                // session()->flash('user_api_hash', $responseData["user_api_hash"]);
                 return redirect()->intended('usermanagement');
             }
             else{

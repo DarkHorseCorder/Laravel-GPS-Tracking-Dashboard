@@ -51,3 +51,9 @@ Route::group(['middleware' => 'auth'], function () {
 	Route::get('/{page}', [PageController::class, 'index'])->name('page');
 	Route::post('logout', [LoginController::class, 'logout'])->name('logout');
 });
+
+Route::get('clear', function(){
+	Artisan::call('route:clear');
+	Artisan::call('view:clear');
+	Artisan::call('cache:clear');
+});

@@ -47,8 +47,7 @@ class PageController extends Controller
     public function greendriving()
     {
         $response = Http::get("104.131.12.58/api/get_devices?user_api_hash=".session('user_api_hash'));
-        $jsonData = $response->json();
-        $devices = $jsonData[0]['items'];
+        $devices = $response[0]['items'];
         return view("pages.green-driving", compact('devices'));
     }
     public function performance()

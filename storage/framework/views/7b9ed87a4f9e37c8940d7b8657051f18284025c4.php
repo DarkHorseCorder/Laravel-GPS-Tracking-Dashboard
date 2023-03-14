@@ -3,9 +3,9 @@
     <div class="sidenav-header">
         <i class="fas fa-times p-3 cursor-pointer text-secondary opacity-5 position-absolute end-0 top-0 d-none d-xl-none"
             aria-hidden="true" id="iconSidenav"></i>
-        <a class=" m-0" href="<?php echo e(route('home')); ?>"
+        <a style="display: flex; justify-content : center; width : 100%" class=" m-0 pt-2" href="<?php echo e(route('home')); ?>"
             target="_blank">
-            <img src="./img/logos/logo.png" class="h-100" alt="main_logo">
+            <img src="./img/logos/logo.png" style="width: 180px" alt="main_logo">
             <!-- <span class="ms-1 font-weight-bold">Argon Dashboard 2 Laravel</span> -->
         </a>
     </div>
@@ -23,7 +23,7 @@
             </li>
             <li class="nav-item mt-3 d-flex align-items-center">
                 <div class="ps-4">
-                    <i class="ni ni-bullet-list-67" style="color: #f4645f;"></i>
+                    <i class="ni ni-bullet-list-67" style="color: #de3435;"></i>
                 </div>
                 <h6 class="ms-2 text-uppercase text-xs font-weight-bolder opacity-6 mb-0">Reports</h6>
             </li>

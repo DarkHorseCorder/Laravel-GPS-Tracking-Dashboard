@@ -44,9 +44,9 @@
             <?php echo $__env->yieldContent('content'); ?>
         <?php else: ?>
             <?php if(!in_array(request()->route()->getName(), ['profile', 'profile-static'])): ?>
-                <div class="min-height-300 bg-primary position-absolute w-100"></div>
+                <div class="min-height-90 bg-primary position-absolute w-100"></div>
             <?php elseif(in_array(request()->route()->getName(), ['profile-static', 'profile'])): ?>
-                <div class="position-absolute w-100 min-height-300 top-0" style="background-image: url('https://raw.githubusercontent.com/creativetimofficial/public-assets/master/argon-dashboard-pro/assets/img/profile-layout-header.jpg'); background-position-y: 50%;">
+                <div class="position-absolute w-100 min-height-90 top-0" style="background-image: url('https://raw.githubusercontent.com/creativetimofficial/public-assets/master/argon-dashboard-pro/assets/img/profile-layout-header.jpg'); background-position-y: 50%;">
                     <span class="mask bg-primary opacity-6"></span>
                 </div>
             <?php endif; ?>
@@ -239,16 +239,16 @@
                         }
                         let tableOutput = `
                         <div class="container">
-                        <table class="ptable table-bordered">
+                        <table class="table table-bordered" style="width : 100%">
                             <thead>
                                 <tr>
-                                    <th>Driver Name</th>
-                                    <th>Device Name</th>
-                                    <th>Total Distance</th>
-                                    <th>High Speed</th>
-                                    <th>Max Acceleration</th>
-                                    <th>Max Braking</th>
-                                    <th>Max Cornering</th>
+                                    <th style="width : 25%">Driver Name</th>
+                                    <th style="width : 25%">Device Name</th>
+                                    <th style="width : 10%">Total Distance</th>
+                                    <th style="width : 10%">High Speed</th>
+                                    <th style="width : 10%">Max Acceleration</th>
+                                    <th style="width : 10%">Max Braking</th>
+                                    <th style="width : 10%">Max Cornering</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -611,7 +611,7 @@
                             text-align: center;
                         }
                         .table{
-                            border: 1px solid #ddd;
+                            border: 2px solid #000;
                             width: 100%;
                             max-width: 100%;
                             margin-bottom: 20px;
@@ -629,7 +629,7 @@
                         .table-bordered>thead>tr>th{
                             border-top: 0;
                             border-bottom-width: 2px;
-                            border: 1px solid #ddd;
+                            border: 2px solid #000;
                             padding: 8px;
                             line-height: 1.42857143;
                         }
@@ -637,29 +637,20 @@
                             vertical-align: bottom;
                         }
                         th{
-                            text-align: left;
+                            text-align: center;
+                            border : none
                         }
                         .table-bordered>tbody>tr>td {
-                            border: 1px solid #ddd;
+                            border: 2px solid #000;
                         }
                         .table>tbody>tr>td{
                             padding: 8px;
                             line-height: 1.42857143;
                             vertical-align: top;
+                            text-align : center;
                         }
-                        .ptable{
-                            border: 1px solid #ddd;
-                            width: 100%;
-                            max-width: 100%;
-                            margin-bottom: 20px;
-                            background-color: transparent;
-                            border-collapse: collapse;
-                            border-spacing: 0;
-                        }
-                        .ptable>tbody>tr>td{
-                            padding: 8px;
-                            line-height: 1.42857143;
-                            vertical-align: top;
+                        tr:nth-child(even) {
+                            background-color: #efefef;
                         }
                     </style>
                 </head>
@@ -721,11 +712,15 @@
                 },
                 jsPDF: {
                 unit: 'in',
-                format: 'letter',
+                format: 'a4',
                 orientation: 'landscape',
                 pageSize : 'A4'
                 }
             };
+            // const table = document.createElement('div');
+            // table.innerHTML = htmlOutput;
+
+            // document.body.appendChild(table);
             // Convert the HTML to PDF using the html2pdf library
             html2pdf().set(opt).from(htmlOutput).save();
         }

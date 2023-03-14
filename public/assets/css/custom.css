@@ -74,3 +74,6 @@
     background-color: #F44336 !important;
     color: #fff !important;
 }
+tr:nth-child(even) {
+    background-color: #efefef;
+}
